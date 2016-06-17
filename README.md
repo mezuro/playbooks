@@ -9,4 +9,4 @@ Ansible playbooks for setting up the mezuro.org services
 
 ## Usage
 
-TODO
+`ansible all -m ping -u <USERNAME>`
