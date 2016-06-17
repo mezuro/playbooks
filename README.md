@@ -13,4 +13,4 @@ Ansible playbooks for setting up the mezuro.org services
 
 ## License
 
-GPLv3 (see COPYING file)
+This is licensed under GPLv3 (see COPYING file) by the AUTHORS (see AUTHORS file).
