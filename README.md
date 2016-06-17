@@ -10,3 +10,7 @@ Ansible playbooks for setting up the mezuro.org services
 ## Usage
 
 `ansible all -m ping -u <USERNAME>`
+
+## License
+
+GPLv3 (see COPYING file)
