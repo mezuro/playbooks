@@ -6,20 +6,32 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 Vagrant.configure("2") do |config|
-  config.vm.define "prezento"
-    # See https://www.vagrantup.com/docs/provisioning/docker.html for more info
-    config.vm.provider "docker" do |d|
-      d.build_dir = '.'
-      d.build_args = '--tag=sshd_ubuntu'
-      d.ports ["50022:22", "8085:8085"]
-    end
+  # For reference see https://www.vagrantup.com/docs/docker/configuration.html
+  config.vm.provider "docker" do |d|
+    d.build_dir = '.'
+    d.build_args = '--tag=systemd_sshd_ubuntu'
+    d.has_ssh = true #FIXME: Vagrant should be able to set the ssh configurations
+    d.create_args = ['--privileged'] # FIXME: this permission is too wide, theoretically just `--cap-add SYS_ADMIN` should be enough
+    d.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:ro"]
   end
 
-  #config.vm.provision "docker" do |d|
-  #  d.build_image ".", args: '-t sshd-ubuntu'
-  #  #d.build_dir '.'
-  #  d.run "sshd-ubuntu"
-  #end
+  config.ssh.username = 'root'
+  config.ssh.password = 'mezuro'
+
+  config.vm.provision "shell", inline: 'systemctl start systemd-user-sessions.service'
+
+  config.vm.define "prezento" do |prezento|
+    prezento.vm.network "forwarded_port", guest: 22, host: 50022, id: 'ssh'
+    prezento.vm.network "forwarded_port", guest: 8085, host: 50085
+  end
+
+  config.vm.define "postgresql" do |prezento|
+    prezento.vm.network "forwarded_port", guest: 22, host: 50122
+  end
+
+  config.vm.define "kalibro" do |prezento|
+    prezento.vm.network "forwarded_port", guest: 22, host: 50222, id: 'ssh'
+  end
 
   # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
