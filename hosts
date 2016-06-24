@@ -2,3 +2,12 @@
 prezento ansible_host='mezuro.org' ansible_port=10101
 postgresql ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q mezuro.org -p 10101"' ansible_host=172.24.1.12
 kalibro ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q mezuro.org -p 10101"' ansible_host=172.24.1.13
+
+[dev.mezuro.org]
+prezento-dev ansible_port=50022
+postgresql-dev ansible_port=50122
+kalibro-dev ansible_port=50222
+
+[dev.mezuro.org:vars]
+ansible_host='localhost'
+ansible_user='mezuro'
