@@ -40,6 +40,9 @@ RUN adduser mezuro sudo
 ENV NOTVISIBLE "in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
 
+# Install python in order to get ansible working
+RUN apt-get update && apt-get -y install python
+
 EXPOSE 22
 
 ENTRYPOINT ["/lib/systemd/systemd"]

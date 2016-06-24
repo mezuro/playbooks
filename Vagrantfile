@@ -18,6 +18,7 @@ Vagrant.configure("2") do |config|
   config.ssh.username = 'root'
   config.ssh.password = 'mezuro'
 
+  # Otherwise you can only ssh as root
   config.vm.provision "shell", inline: 'systemctl start systemd-user-sessions.service'
 
   config.vm.define "prezento" do |prezento|
@@ -25,12 +26,12 @@ Vagrant.configure("2") do |config|
     prezento.vm.network "forwarded_port", guest: 8085, host: 50085
   end
 
-  config.vm.define "postgresql" do |prezento|
-    prezento.vm.network "forwarded_port", guest: 22, host: 50122
+  config.vm.define "postgresql" do |postgresql|
+    postgresql.vm.network "forwarded_port", guest: 22, host: 50122
   end
 
-  config.vm.define "kalibro" do |prezento|
-    prezento.vm.network "forwarded_port", guest: 22, host: 50222, id: 'ssh'
+  config.vm.define "kalibro" do |kalibro|
+    kalibro.vm.network "forwarded_port", guest: 22, host: 50222, id: 'ssh'
   end
 
   # The most common configuration options are documented and commented below.
