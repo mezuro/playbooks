@@ -1,0 +1,9 @@
+disable remote-fs.target
+disable machines.target
+disable getty.target
+disable getty@.service
+disable systemd-timesyncd.service
+disable systemd-networkd.service
+disable systemd-resolved.service
+
+enable ssh.service
