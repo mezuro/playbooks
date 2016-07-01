@@ -1,0 +1,16 @@
+- hosts: all
+  roles:
+    - role: common
+- hosts: kalibro
+  roles:
+    #- role: rvm
+    #- role: kalibro_configurations
+    #- role: kalibro_processor
+- hosts: postgresql
+  roles:
+    - role: postgresql
+- hosts: prezento
+  roles:
+    #- role: rvm
+    #- role: prezento
+    #- role: web_proxy
