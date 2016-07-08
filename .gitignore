@@ -1,1 +1,5 @@
-.vagrant
+/.vagrant/
+/fact_cache/
+/secrets.yml
+/.vault-pass
+/site.retry
