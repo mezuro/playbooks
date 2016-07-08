@@ -1,0 +1,15 @@
+prezento   ansible_host=mezuro.org  ansible_port=10100
+postgresql ansible_host=172.24.1.12 ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q mezuro.org -p 10100"' 
+kalibro    ansible_host=172.24.1.13 ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q mezuro.org -p 10100"' 
+
+[prezento_servers]
+prezento
+
+[db_servers]
+postgresql
+
+[kalibro_configurations_servers]
+kalibro 
+
+[kalibro_processor_servers]
+kalibro 
