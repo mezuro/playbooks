@@ -1,0 +1,17 @@
+---
+kalibro_configurations:
+  repo_url: https://github.com/mezuro/kalibro_configurations.git
+  repo_rev: v2.1.3
+  app_port: 8083
+  ruby_version: '2.3.0'
+kalibro_processor:
+  repo_url: https://github.com/mezuro/kalibro_processor.git
+  repo_rev: v1.3.2
+  app_port: 8082
+  ruby_version: '2.3.0'
+prezento:
+  repo_url: 'https://github.com/mezuro/prezento.git'
+  repo_rev: v1.1.0
+  app_port: 8085
+  ruby_version: '2.3.0'
+  

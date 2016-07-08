@@ -1,0 +1,10 @@
+---
+postgresql_version: '9.5'
+postgresql_listen_addresses:
+  - "*"
+postgresql_pg_hba_custom:
+  - type: host
+    database: all
+    user: all
+    address: 0.0.0.0/0
+    method: md5

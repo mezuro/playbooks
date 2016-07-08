@@ -1,0 +1,5 @@
+- name: generate kalibro.yml for Likeno
+  template:
+    src: "{{ playbook_dir }}/templates/kalibro.yml.j2"
+    dest: "{{ ansistrano_shared_path.stdout }}/config/kalibro.yml"
+

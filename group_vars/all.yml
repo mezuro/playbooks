@@ -1,0 +1,8 @@
+---
+common_packages:
+  - vim
+  - wget
+  - htop
+ansistrano_allow_anonymous_stats: no
+ansistrano_keep_releases: 3
+
