@@ -1,0 +1,5 @@
+- src: ANXS.postgresql
+- src: andrewrothstein.curl
+- src: carlosbuenosvinos.ansistrano-deploy
+- src: carlosbuenosvinos.ansistrano-rollback
+- src: rvm_io.rvm1-ruby

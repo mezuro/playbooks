@@ -10,10 +10,13 @@ Ansible playbooks for setting up the mezuro.org services
 ## Usage
 
 `ansible all -m ping -u <USERNAME>`
+### Install external modules
 
 ## Development
+The playbooks require some modules from Ansible Galaxy. To install them, run:
 
 The environment is based on Docker within Vagrant.
+`ansible-galaxy install -r requirements.yml -p roles.lib`
 
 `vagrant up --provider docker`
 

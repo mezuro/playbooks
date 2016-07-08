@@ -3,3 +3,4 @@
 /secrets.yml
 /.vault-pass
 /site.retry
+/roles.lib/
