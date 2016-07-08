@@ -1,0 +1,2 @@
+- name: clear empty log directory
+  file: path="{{ ansistrano_release_path.stdout }}/log/.keep" state=absent

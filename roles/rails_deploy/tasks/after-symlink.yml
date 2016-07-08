@@ -1,0 +1,6 @@
+- command: /bin/true
+  notify: 
+    - compile assets
+    - migrate database
+    - restart job workers
+    - reload puma

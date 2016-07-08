@@ -1,0 +1,15 @@
+[Unit]
+Description=delayed_job workers - {{ rails_app_name }}
+
+[Service]
+Type=forking
+User={{ rails_app_user }}
+WorkingDirectory={{ rails_app_path }}/current
+EnvironmentFile={{ rails_app_path }}/current/.env
+ExecStart={{ rvm_bin_dir}}/rvm-exec . bundle exec bin/delayed_job start -n "{{ rails_delayed_job_workers }}" {{ rails_delayed_job_args }}
+ExecStop={{ rvm_bin_dir}}/rvm-exec . bundle exec bin/delayed_job stop
+Restart=always
+TimeoutStopSec=2m
+
+[Install]
+WantedBy=multi-user.target

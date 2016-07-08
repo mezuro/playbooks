@@ -1,0 +1,104 @@
+---
+- name: create database.yml
+  template:
+    src: "{{ rails_deploy_base_dir }}/templates/database.yml.j2"
+    dest: "{{ ansistrano_shared_path.stdout }}/config/database.yml"
+    owner: "{{ rails_app_user }}"
+    group: "{{ rails_app_user }}"
+  notify:
+    - restart job workers
+    - reload puma
+- name: create puma configuration
+  template:
+    src: "{{ rails_deploy_base_dir }}/templates/puma.rb.j2"
+    dest: "{{ ansistrano_shared_path.stdout }}/config/puma.rb"
+    owner: "{{ rails_app_user }}"
+    group: "{{ rails_app_user }}"
+  notify: reload puma
+- name: create asset checking script
+  copy:
+    src: "{{ rails_deploy_base_dir }}/files/check_assets_fresh"
+    dest: "{{ ansistrano_shared_path.stdout }}/bin/"
+    owner: "{{ rails_app_user }}"
+    group: "{{ rails_app_user }}"
+    mode: a+x
+- name: create environment file
+  template:
+    src: "{{ rails_deploy_base_dir }}/templates/env.j2"
+    dest: "{{ ansistrano_shared_path.stdout }}/.env"
+    owner: "{{ rails_app_user }}"
+    group: "{{ rails_app_user }}"
+  notify: 
+    - restart puma
+    - restart job workers
+- block:
+  - name: create job worker systemd services
+    template:
+      src: "{{ rails_deploy_base_dir }}/templates/delayed_job.service.j2"
+      dest: /etc/systemd/system/{{ rails_app_name }}-jobs.service
+    notify:
+      - reload systemd configuration
+      - restart job workers
+    when: rails_delayed_job_enable
+  - name: create web server systemd services
+    template:
+      src: "{{ rails_deploy_base_dir }}/templates/puma.service.j2"
+      dest: /etc/systemd/system/{{ rails_app_name }}-web.service
+    notify:
+      - reload systemd configuration
+      - restart puma
+  become: yes
+  become_user: root
+- include: "{{ item }}"
+  with_items: "{{ rails_app_setup_playbooks }}"
+  when: rails_app_setup_playbooks is defined
+- block:
+  - name: install bundler
+    command: "{{ rvm_bin_dir }}/rvm-exec . gem install bundler --conservative"
+    args:
+      chdir: "{{ ansistrano_release_path.stdout }}"
+  - name: install project gems with Bundler
+    command: "{{ rvm_bin_dir }}/rvm-exec . bundle install --path vendor/bundle --retry 3 -j4 --without development test"
+    args:
+      chdir: "{{ ansistrano_release_path.stdout }}"
+  - name: check if puma is present in the bundle
+    command: "{{ rvm_bin_dir }}/rvm-exec . bundle show puma"
+    args:
+      chdir: "{{ ansistrano_release_path.stdout }}"
+    register: bundle_show_puma
+    changed_when: bundle_show_puma.rc != 0
+    failed_when: false
+  - name: add puma to Gemfile
+    lineinfile:
+      dest: "{{ ansistrano_release_path.stdout }}/Gemfile"
+      line: gem 'puma'
+    when: bundle_show_puma|changed
+  - name: re-run Bundler
+    command: "{{ rvm_bin_dir }}/rvm-exec . bundle install"
+    args:
+      chdir: "{{ ansistrano_release_path.stdout }}"
+    when: bundle_show_puma|changed
+  - name: ensure tmp dirs exist
+    command: "{{ rvm_bin_dir }}/rvm-exec . bundle exec rake tmp:create"
+    args:
+      chdir: "{{ ansistrano_release_path.stdout }}"
+  - name: check whether asset compilation is needed
+    command: bin/check_assets_fresh '{{ ansistrano_releases_path.stdout }}/current' .
+    args:
+      chdir: "{{ ansistrano_release_path.stdout }}"
+    register: assets_fresh
+    changed_when: assets_fresh.rc == 1
+    failed_when: assets_fresh.rc not in (0, 1)
+    notify: compile assets
+  - name: check whether database tables are initialized
+    command: bin/check_assets_fresh '{{ ansistrano_releases_path.stdout }}/current' .
+    args:
+      chdir: "{{ ansistrano_release_path.stdout }}"
+    register: assets_fresh
+    changed_when: assets_fresh.rc == 1
+    failed_when: assets_fresh.rc not in (0, 1)
+    notify: compile assets
+  environment:
+    RAILS_ENV: "{{ rails_env }}"
+  become: yes
+  become_user: "{{ rails_app_user }}"

@@ -1,0 +1,28 @@
+app_dir      = '{{ rails_app_path }}/current'
+tmp_dir      = "#{app_dir}/tmp"
+log_dir      = "#{app_dir}/log"
+
+rails_env = ENV['RAILS_ENV'] || "production"
+environment rails_env
+
+daemonize  false
+workers    {{ rails_puma_num_workers }}
+threads    {{ rails_puma_worker_threads }}
+
+{% for bind in rails_puma_bind %}
+bind '{{ bind }}'
+{% endfor %}
+
+directory        app_dir
+pidfile          "#{tmp_dir}/pids/puma.pid"
+
+log_suffix = Time.now.strftime('%Y-%m-%d_%H-%M-%S')
+stdout_redirect  "#{log_dir}/access_#{log_suffix}.log", "#{log_dir}/errors_#{log_suffix}.log"
+
+prune_bundler
+preload_app!
+
+on_worker_boot do
+  # Valid on Rails 4.1+ using the `config/database.yml` method of setting `pool` size
+  ActiveRecord::Base.establish_connection
+end

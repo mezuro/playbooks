@@ -1,0 +1,10 @@
+- block:
+  - name: install package prerequisites
+    package: name={{ item }} state=present
+    with_items:
+      - libpq-dev
+      - git
+  - name: create system user
+    user: name={{ rails_app_user }} groups=rvm append=yes
+  become: yes
+  become_user: root

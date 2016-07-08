@@ -1,0 +1,11 @@
+{{ rails_env }}:
+  adapter: postgresql
+  encoding: unicode
+{% if rails_db_host %}
+  host: {{ rails_db_host }}
+{% endif %}
+  database: {{ rails_app_name }}_{{ rails_env }}
+  pool: {{ rails_db_pool_size }}
+  username: {{ rails_db_user }}
+  password: {{ rails_db_passwd }}
+  template: template0

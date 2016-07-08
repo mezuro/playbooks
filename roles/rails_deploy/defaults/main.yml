@@ -1,0 +1,20 @@
+rails_app_path: /home/{{ rails_app_user }}/{{ rails_app_name }}
+rails_app_user: "{{ rails_app_name }}"
+rails_app_shared_paths: []
+rails_app_shared_files: []
+rails_app_env_vars: {}
+rails_app_setup_playbooks: []
+rails_env: production
+rails_secret_key_base: 
+rails_db_host: localhost
+rails_db_name: "{{ rails_app_name }}_{{ rails_env }}"
+rails_db_user: "{{ rails_app_user }}"
+rails_db_passwd: "{{ rails_app_user }}"
+rails_db_pool_size: 5
+rails_puma_num_workers: 2
+rails_puma_worker_threads: 4, 4
+rails_puma_bind:
+  - tcp://0.0.0.0:{{ rails_app_port | default('3000') }}
+rails_delayed_job_enable: no
+rails_delayed_job_workers: 4
+rails_delayed_job_args: 

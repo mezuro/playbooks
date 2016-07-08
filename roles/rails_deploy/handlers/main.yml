@@ -1,0 +1,29 @@
+---
+- block:
+  - name: compile assets
+    command: "{{ rvm_bin_dir }}/rvm-exec . bundle exec rake assets:precompile"
+    args:
+      chdir: "{{ ansistrano_release_path.stdout }}"
+  - name: migrate database
+    command: "{{ rvm_bin_dir }}/rvm-exec . bundle exec rake db:migrate"
+    args:
+      chdir: "{{ ansistrano_release_path.stdout }}"
+    when: database_schema_loaded is undefined
+  environment:
+    RAILS_ENV: "{{ rails_env }}"
+  become: yes
+  become_user: "{{ rails_app_user }}"
+- block:
+  - name: reload systemd configuration
+    command: systemctl daemon-reload
+  - name: restart job workers
+    service: name="{{ rails_app_name }}-jobs" enabled=yes state=restarted
+    when: rails_delayed_job_enable
+  - name: restart puma
+    service: name="{{ rails_app_name }}-web" enabled=yes state=restarted
+    register: puma_restarted
+  - name: reload puma
+    service: name="{{ rails_app_name }}-web" enabled=yes state=reloaded
+    when: puma_restarted is undefined
+  become: yes
+  become_user: root

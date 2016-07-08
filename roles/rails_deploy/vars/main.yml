@@ -1,0 +1,12 @@
+rails_deploy_base_dir: "{{ playbook_dir }}/roles/rails_deploy"
+rails_deploy_shared_paths:
+  - tmp
+  - log
+  - vendor/bundle
+  - vendor/cache
+rails_deploy_shared_files:
+  - config/database.yml
+  - config/puma.rb
+  - bin/check_assets_fresh
+  - .env
+rvm_bin_dir: "{{ rvm1_install_path }}/bin"

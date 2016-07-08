@@ -1,0 +1,17 @@
+[Unit]
+Description=Puma HTTP Server - {{ rails_app_name }}
+After=network.target
+
+[Service]
+Type=simple
+User={{ rails_app_user }}
+WorkingDirectory={{ rails_app_path }}/current
+EnvironmentFile={{ rails_app_path }}/current/.env
+PIDFile={{ rails_app_path }}/current/tmp/pids/puma.pid
+ExecStart={{ rvm_bin_dir}}/rvm-exec . bundle exec puma -C config/puma.rb
+ExecReload=/bin/kill -USR2 $MAINPID
+Restart=always
+TimeoutStopSec=2m
+
+[Install]
+WantedBy=multi-user.target
