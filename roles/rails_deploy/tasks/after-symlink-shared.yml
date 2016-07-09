@@ -82,18 +82,11 @@
     command: "{{ rvm_bin_dir }}/rvm-exec . bundle exec rake tmp:create"
     args:
       chdir: "{{ ansistrano_release_path.stdout }}"
-  - name: check whether asset compilation is needed
-    command: bin/check_assets_fresh '{{ ansistrano_releases_path.stdout }}/current' .
-    args:
-      chdir: "{{ ansistrano_release_path.stdout }}"
-    register: assets_fresh
-    changed_when: assets_fresh.rc == 1
-    failed_when: assets_fresh.rc not in (0, 1)
-    notify: compile assets
-  - name: check whether database tables are initialized
-    command: bin/check_assets_fresh '{{ ansistrano_releases_path.stdout }}/current' .
-    args:
-      chdir: "{{ ansistrano_release_path.stdout }}"
+  - name: check if asset compilation is needed
+    script: |
+      "{{ rails_deploy_base_dir }}/files/check_assets_fresh"
+      '{{ ansistrano_deploy_to }}/current'
+      '{{ ansistrano_release_path.stdout }}'
     register: assets_fresh
     changed_when: assets_fresh.rc == 1
     failed_when: assets_fresh.rc not in (0, 1)

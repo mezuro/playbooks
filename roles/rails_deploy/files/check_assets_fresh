@@ -1,16 +1,22 @@
-#!/bin/sh
+#!/bin/sh -x
 
 old_dir="$1"
 new_dir="$2"
 
-if ! [ -d "$old_dir" ] || ! [ -d "$new_dir" ]; then
-    exit 1
-fi
+[ -d "$old_dir" ] || exit 1
+[ -d "$new_dir" ] || exit 2
 
 for asset_dir in app/assets vendor/assets lib/assets; do
-    if ! diff -qrN "$old_dir"/"$asset_dir" "$new_dir"/"$asset_dir"; then
-        exit $?
+    old_asset_dir="$old_dir/$asset_dir"
+    new_asset_dir="$new_dir/$asset_dir"
+
+    if ! [ -e "$old_asset_dir" ] && ! [ -e "$new_asset_dir" ]; then
+        continue
     fi
+
+    diff -qrN "$old_asset_dir" "$new_asset_dir"
+    diff_ret=$?
+    [ $diff_ret -eq 0 ] || exit $diff_ret
 done
 
 exit 0
