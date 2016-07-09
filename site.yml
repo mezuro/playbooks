@@ -2,10 +2,12 @@
 - hosts: all
   gather_facts: yes
   tasks:
-    - name: determine server address
+    - name: determine server addresses
       set_fact:
         kalibro_configurations_addr: "{{ hostvars[groups.kalibro_configurations_servers[0]].ansible_default_ipv4.address }}"
         kalibro_processor_addr: "{{ hostvars[groups.kalibro_processor_servers[0]].ansible_default_ipv4.address }}"
+        db_master_host: "{{ groups.db_servers[0] }}"
+        db_master_host_addr: " {{ hostvars[groups.db_servers[0]].ansible_default_ipv4.address }}"
   tags:
     - always
 - hosts: all

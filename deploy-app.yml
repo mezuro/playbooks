@@ -1,7 +1,6 @@
 ---
 - name: Deploy {{ rails_app_name }}
   hosts: "{{ rails_app_name }}_servers"
-  gather_facts: yes
   vars_files:
     - meta.yml
     - secrets.yml
@@ -15,21 +14,6 @@
     rails_secret_key_base: "{{ secrets.rails_secret_key_base[rails_app_name] | default(None) }}"
   pre_tasks:
     - block:
-      - name: gather facts from db servers
-        setup:
-        delegate_to: "{{ item }}"
-        delegate_facts: yes
-        with_items: "{{ groups['db_servers'] }}"
-      - name: determine database master host
-        set_fact: db_master_host="{{ groups['db_servers'] | first }}"
-        when: db_master_host is undefined
-      - name: determine database master IP
-        set_fact: db_master_host_addr="{{ hostvars[db_master_host].ansible_default_ipv4.address }}"
-        when: db_master_host_addr is undefined
-      when: "{{ groups['db_servers'] }}"
-      tags:
-        - db
-    - block:
       - name: create database user
         postgresql_user:
           name: "{{ rails_db_user }}"
@@ -40,9 +24,10 @@
           name: "{{ rails_app_name }}_{{ rails_env }}"
           owner: "{{ rails_db_user }}"
       delegate_to: "{{ db_master_host }}"
+      become: yes
+      become_user: root
       run_once: yes
       when: db_master_host is defined
-      tags:
-        - db
+      tags: [db]
   roles:
     - rails_deploy
