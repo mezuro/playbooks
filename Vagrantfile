@@ -1,13 +1,18 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :.
 
-ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
+# Avoid having multiple docker images built at once, or Ansible being run before
+# some of the VMs are up
 ENV['VAGRANT_NO_PARALLEL'] = 'yes'
 
+ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
+
 Vagrant.configure("2") do |config|
+  config.ssh.username = 'vagrant'
+  config.ssh.password = 'vagrant'
+
   config.vm.provider "docker" do |d|
-    d.build_dir = './docker'
-    
+    d.build_dir = './docker'    
     d.has_ssh = true
     d.create_args = ['--cap-add=SYS_ADMIN']
     d.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:ro"]
@@ -17,8 +22,18 @@ Vagrant.configure("2") do |config|
     end
   end
 
-  config.ssh.username = 'root'
-  config.ssh.password = 'mezuro'
+  config.vm.provider "virtualbox" do |vb, override|
+    vb.memory = 1024
+    vb.cpus = 2
+    override.vm.box = "xenial64"
+  end
+
+  config.vm.provider "libvirt" do |lv, override|
+    lv.driver = "kvm"
+    lv.memory = 1024
+    lv.cpus = 2
+    override.vm.box = "nrclark/xenial64-minimal-libvirt"
+  end
 
   config.vm.define "postgresql" do |postgresql|
     postgresql.vm.network "forwarded_port", guest: 22, host: 50122, id: 'ssh'
@@ -37,6 +52,7 @@ Vagrant.configure("2") do |config|
       d.build_args = ['--tag', 'mezuro-ubuntu-systemd:latest']
       d.expose += [8082, 8083]
     end
+
   end
 
   config.vm.define "prezento" do |prezento|
