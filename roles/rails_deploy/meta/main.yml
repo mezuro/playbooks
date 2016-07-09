@@ -1,11 +1,13 @@
 dependencies:
   - role: andrewrothstein.curl
-  - role: rvm_io.rvm1-ruby
-    tags: ruby
     become: yes
+    become_user: root
+  - role: rvm_io.rvm1-ruby
     rvm1_rubies: 
       - "{{ rails_ruby_version }}"
     rvm1_rvm_check_for_updates: no
+    become: yes
+    become_user: root
   - role: carlosbuenosvinos.ansistrano-deploy
     ansistrano_deploy_to: "{{ rails_app_path }}"
     ansistrano_deploy_via: git
@@ -13,15 +15,13 @@ dependencies:
     ansistrano_git_branch: "{{ repo_rev }}"
     ansistrano_shared_paths: "{{ (rails_deploy_shared_paths + rails_app_shared_paths) }}"
     ansistrano_shared_files: "{{ (rails_deploy_shared_files + rails_app_shared_files) }}"
-    
     # HACK: it isn't possible to refer to the path of the current role when passing
     # an option to a dependency - the role_path variable is only evaluated too late.
     # Work around it by passing a path relative to the play book.
     # See https://github.com/ansible/ansible/issues/10374
-    ansistrano_before_setup_tasks_file: "{{ rails_deploy_base_dir }}/tasks/before-setup.yml"    
-    #ansistrano_after_setup_tasks_file: "{{ rails_deploy_base_dir }}/tasks/after-setup.yml"
+    ansistrano_before_setup_tasks_file: "{{ rails_deploy_base_dir }}/tasks/before-setup.yml"
     ansistrano_before_symlink_shared_tasks_file: "{{ rails_deploy_base_dir }}/tasks/before-symlink-shared.yml"
     ansistrano_after_symlink_shared_tasks_file: "{{ rails_deploy_base_dir }}/tasks/after-symlink-shared.yml"
     ansistrano_after_symlink_tasks_file: "{{ rails_deploy_base_dir }}/tasks/after-symlink.yml"
-    become: true
+    become: yes
     become_user: "{{ rails_app_user }}"

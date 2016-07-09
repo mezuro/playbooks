@@ -1,13 +1,25 @@
 ---
-- name: Install basic packages
-  apt: pkg={{item}} state=installed
-  with_items: "{{ common_packages }}"
-- name: Install unattended-upgrades package
-  apt: pkg=unattended-upgrades state=installed
-- name: Configure unattended-upgrades package
-  copy: src={{item}} dest=/etc/apt/apt.conf.d
-  with_items:
-    - 20auto-upgrades
-    - 50unattended-upgrades
-- name: Enable unattended-upgrades service
-  service: name=apt-daily.timer state=started enabled=yes
+- block:
+  - name: setup password-less sudo to change to non-root users
+    copy:
+      dest: /etc/sudoers.d/ansible-{{ ansible_user }}-allow-switch-user
+      content: |
+        {{ ansible_user }} ALL=(ALL) NOPASSWD:ALL
+      validate: visudo -cf %s
+      owner: root
+      group: root
+      mode: 400
+  - name: install basic packages
+    apt: pkg={{item}} state=installed
+    with_items: "{{ common_packages }}"
+  - name: install unattended-upgrades package
+    apt: pkg=unattended-upgrades state=installed
+  - name: configure unattended-upgrades package
+    copy: src={{item}} dest=/etc/apt/apt.conf.d
+    with_items:
+      - 20auto-upgrades
+      - 50unattended-upgrades
+  - name: enable unattended-upgrades service
+    service: name=apt-daily.timer state=started enabled=yes
+  become: yes
+  become_user: root

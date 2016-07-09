@@ -13,7 +13,9 @@
     - role: common
 - hosts: db_servers
   roles:
-    - role: postgresql
+    - role: ANXS.postgresql
+      become: yes
+      become_user: root
   tags:
     - db
 - include: deploy-app.yml
