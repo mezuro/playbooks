@@ -8,5 +8,6 @@ rails_deploy_shared_files:
   - config/database.yml
   - config/puma.rb
   - bin/check_assets_fresh
+  - lib/tasks/db_init_or_migrate.rake
   - .env
 rvm_bin_dir: "{{ rvm1_install_path }}/bin"

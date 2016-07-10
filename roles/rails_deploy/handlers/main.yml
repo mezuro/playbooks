@@ -5,10 +5,9 @@
     args:
       chdir: "{{ ansistrano_release_path.stdout }}"
   - name: migrate database
-    command: "{{ rvm_bin_dir }}/rvm-exec . bundle exec rake db:migrate"
+    command: "{{ rvm_bin_dir }}/rvm-exec . bundle exec rake db:init_or_migrate"
     args:
       chdir: "{{ ansistrano_release_path.stdout }}"
-    when: database_schema_loaded is undefined
   environment:
     RAILS_ENV: "{{ rails_env }}"
   become: yes

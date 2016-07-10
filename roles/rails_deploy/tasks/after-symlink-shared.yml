@@ -15,13 +15,6 @@
     owner: "{{ rails_app_user }}"
     group: "{{ rails_app_user }}"
   notify: reload puma
-- name: create asset checking script
-  copy:
-    src: "{{ rails_deploy_base_dir }}/files/check_assets_fresh"
-    dest: "{{ ansistrano_shared_path.stdout }}/bin/"
-    owner: "{{ rails_app_user }}"
-    group: "{{ rails_app_user }}"
-    mode: a+x
 - name: create environment file
   template:
     src: "{{ rails_deploy_base_dir }}/templates/env.j2"
@@ -31,6 +24,19 @@
   notify: 
     - restart puma
     - restart job workers
+- name: create asset checking script
+  copy:
+    src: "{{ rails_deploy_base_dir }}/files/check_assets_fresh"
+    dest: "{{ ansistrano_shared_path.stdout }}/bin/"
+    owner: "{{ rails_app_user }}"
+    group: "{{ rails_app_user }}"
+    mode: a+x
+- name: create DB migration rake task
+  copy:
+    src: "{{ rails_deploy_base_dir }}/files/db_init_or_migrate.rake"
+    dest: "{{ ansistrano_shared_path.stdout }}/lib/tasks/"
+    owner: "{{ rails_app_user }}"
+    group: "{{ rails_app_user }}"
 - block:
   - name: create job worker systemd services
     template:
