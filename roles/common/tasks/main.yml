@@ -9,8 +9,10 @@
       owner: root
       group: root
       mode: 400
+  - name: install acl package to allow safe becoming of unprivileged users
+    apt: pkg=acl state=installed
   - name: install basic packages
-    apt: pkg={{item}} state=installed
+    apt: pkg={{ item }} state=installed
     with_items: "{{ common_packages }}"
   - name: install unattended-upgrades package
     apt: pkg=unattended-upgrades state=installed
